@@ -1,10 +1,10 @@
 {
-    "name": "cold-automation-forensic",
+    "name": "django-webadb",
     "version": "1.0.0",
     "description": "Remote Acquisition Android Smartphone",
     "repository": {
         "type": "git",
-        "url": "https://github.com/mrdotss/cold-forensic-automation"
+        "url": "https://github.com/mrdotss/django-webadb"
     },
     "bugs": {
         "url": "mailto:mayer@fatechid.com",

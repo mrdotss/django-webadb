@@ -1,4 +1,4 @@
-# CAF (Cold Automation Forensic)
+# django-webadb
 
 ## Overview
 
@@ -16,7 +16,7 @@ Note:
 
 ### Prerequisites
 
-Also documented [here](https://s3.wasabisys.com/c343765-a/User-Manual/RAAS%20-%20User%20Manual%20v1.0.pdf) with  how to use. Ensure the following dependencies are installed on your system:
+Also documented [here](https://s3.wasabisys.com/c343765-a/User-Manual/RAAS%20-%20User%20Manual%20v1.0.pdf) with  how to use. Or you can follow the instructions below to ensure the dependencies are installed on your system:
 
 - **Python 3.10+**
 - **SDK Platform Tools** (Add to your PATH)
@@ -37,7 +37,7 @@ Also documented [here](https://s3.wasabisys.com/c343765-a/User-Manual/RAAS%20-%2
 1. **Clone the Repository or Extract the Source Code**:
     ```sh
     git clone [repository_url]    # or extract the folder
-    cd cold-forensic-automation\
+    cd django-webadb\
     ```
 2. **Install yarn packages for the frontend**:
     ```sh
@@ -78,7 +78,7 @@ Also documented [here](https://s3.wasabisys.com/c343765-a/User-Manual/RAAS%20-%2
 
 9. **Run the Worker (New Terminal)**:
     ```sh
-    cd cold-automation-forensic\
+    cd django-webadb\
     source venv/bin/activate   # On Windows use `venv\Scripts\activate`
     celery -A core worker --concurrency=3 -l info
     ```
