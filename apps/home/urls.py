@@ -23,6 +23,7 @@ urlpatterns = [
 
     # The activities page
     path('activities/', views.activitiesList, name='activities_home'),
+    path('activities/ajax/', views.activitiesAjax, name='activities_ajax'),
 
     path('device/', views.Devices.as_view(), name='devices_home'),
     path('device/detail/<str:dev_id>', views.DevicesDetail.as_view(), name='devices_detail'),

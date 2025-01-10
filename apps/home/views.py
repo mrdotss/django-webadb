@@ -1,5 +1,6 @@
 from urllib.parse import parse_qs
 from django.db.models import F
+from django.utils.dateparse import parse_date
 from django.views import View
 from django.template import loader
 from django.urls import reverse_lazy
@@ -222,14 +223,97 @@ class CaseDeleteView(View):
 def is_ajax(request):
     return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
+
 def activitiesList(request):
+    # event_type from query
+    event_type = request.GET.get('event_type')
+    # date range from query
+    start_date_str = request.GET.get('start')
+    end_date_str = request.GET.get('end')
 
-    create_events = CRUDEvent.objects.filter(event_type=CRUDEvent.CREATE).order_by('-datetime')[:10]
+    # Base QuerySet (UNSLICED)
+    all_events = CRUDEvent.objects.all().order_by('-datetime')
+
+    # 1) Filter by event type, if any
+    if event_type:
+        try:
+            etype_val = int(event_type)
+            all_events = all_events.filter(event_type=etype_val)
+        except ValueError:
+            pass
+
+    # 2) Filter by date range, if given
+    if start_date_str and end_date_str:
+        start_date = parse_date(start_date_str)
+        end_date = parse_date(end_date_str)
+        if start_date and end_date:
+            all_events = all_events.filter(datetime__date__range=(start_date, end_date))
+
+    # 3) Now slice for your initial load
+    all_events = all_events[:25]
+
     context = {
-        'create_events': create_events,
+        'events': all_events,
+        'event_type': event_type,
+        'start_date': start_date_str,
+        'end_date': end_date_str,
     }
-
     return render(request, 'home/activities.html', context)
+
+
+
+def activitiesAjax(request):
+    """
+    Handles AJAX requests for the next batch of events.
+    Returns JSON, which the front end will use to append to the table.
+    """
+    offset = int(request.GET.get('offset', 0))
+    limit = int(request.GET.get('limit', 15))
+    event_type = request.GET.get('event_type')
+    start_date_str = request.GET.get('start')
+    end_date_str = request.GET.get('end')
+
+    all_events = CRUDEvent.objects.all().order_by('-datetime')
+
+    # 1) Filter by event type
+    if event_type:
+        try:
+            etype_val = int(event_type)
+            all_events = all_events.filter(event_type=etype_val)
+        except ValueError:
+            pass
+
+    # 2) Filter by date range
+    if start_date_str and end_date_str:
+        start_date = parse_date(start_date_str)
+        end_date = parse_date(end_date_str)
+        if start_date and end_date:
+            all_events = all_events.filter(datetime__date__range=(start_date, end_date))
+
+    # 3) Now slice for lazy loading
+    events_slice = all_events[offset: offset + limit]
+
+    # Convert the events to a JSON-serializable structure
+    data = []
+    for e in events_slice:
+        if e.is_create():
+            event_label = "Create"
+        elif e.is_update():
+            event_label = "Update"
+        elif e.is_delete():
+            event_label = "Delete"
+        else:
+            event_label = "Other"
+
+        data.append({
+            'datetime': e.datetime.strftime("%d %b %Y, %I:%M %p"),
+            'user': str(e.user) if e.user else "—",
+            'event_type': event_label,
+            'object_repr': e.object_repr,
+            'changed_fields': e.changed_fields,
+        })
+
+    return JsonResponse({'events': data})
 
 def get_case_members_by_evidence(request, evidence_id):
     evidence = get_object_or_404(Evidence, evidence_id=evidence_id)
@@ -364,6 +448,9 @@ def get_acquisition_save_location(request, serial_id, unique_link):
             'ipAddress': ipAddress,
             'acquisitionType': acquisitionType,
         }
+
+        if acquisitionType == "selective_full_file_system":
+            return render(request, 'includes/acquisition_save_location_sffs.html', context)
 
         return render(request, 'includes/acquisition_save_location.html', context)
     else:

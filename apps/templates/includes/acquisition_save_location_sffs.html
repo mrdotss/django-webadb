@@ -1,0 +1,60 @@
+<div class="card-header">
+    <h4>
+        <div class="text-center progress-header">
+            Location and Settings
+        </div>
+    </h4>
+</div>
+
+<div class="card-body acquisition-body">
+    <form class="form-row" action="" method="post" id="location-form">
+        {% csrf_token %}
+    <div class="form-group col-md-6">
+         <label for="client_ip">Client IP</label>
+         <span class="d-inline-block" data-toggle="tooltip"
+               data-title="If this device is connected via IP, it's recommended to use the same IP address. But if this device connected VIA USB, it's automatically set by our system.">
+             <i class="fas fa-question-circle"></i></span>
+
+         {% if isWifi %}
+             <input type="text" name="client_ip" value="{{ ipAddress }}" class="form-control" id="client_ip" placeholder="x.x.x.x | Ex: 100.15.25.56">
+         {% else %}
+             <input type="text" name="client_ip" value="USB" class="form-control" id="client_ip" placeholder="Connected VIA USB" disabled>
+        {% endif %}
+     </div>
+     <div class="form-group col-md-6">
+        <label for="file_name">File Name Is Automatically Set</label>
+         {% if acquisitionType == "selective_full_file_system" %}
+            <input type="text" name="file_name" class="form-control" id="file_name" value="[ffs-selective]_[current_time]_[random_string]_[USB/WiFi].tar.gz" disabled>
+         {% elif acquisitionType == "physical" %}
+            <input type="text" name="file_name" class="form-control" id="file_name" value="[partition_name]_[current_time]_[random_string]_[USB/WiFi].dd" disabled>
+         {% endif %}
+     </div>
+    <div class="form-group col-md-6">
+        <label for="full_path">Save Path</label>
+        <span class="d-inline-block" data-toggle="tooltip"
+              data-title="The default location is the 'CAF' folder within the '~Documents' directory.
+              For a manual save location, you can type the full path. For example: `/mnt/c/folder/another_folder`"><i class="fas fa-question-circle"></i></span>
+        <input type="text" name="full_path" class="form-control" id="full_path" placeholder="Leave it blank to use default folder">
+    </div>
+     
+    <div class="form-group col-md-6">
+      <label for="evidence_name">Select Evidence</label>
+      <select class="form-control select2" name="evidence_name" id="evidence_name" required>
+          <option value="">Select...</option>
+          {% for evidences in evidenceList %}
+              <option value="{{ evidences.evidence_id }}">{{ evidences.case_name }} - {{ evidences.evidence_description }}</option>
+          {% endfor %}
+      </select>
+    </div>
+    
+    <div class="form-group col-md-6">
+      <label for="examiner">Examiner</label>
+        <select class="form-control" name="examiner" id="examiner" required>
+            <!--- Filled by Evidence form --->
+        </select>
+    </div>
+    <div class="form-group col-md-6">
+    </div>
+        <button type="submit" class="btn btn-primary" id="partition-btn">GO</button>
+    </form>
+</div>

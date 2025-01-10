@@ -513,5 +513,30 @@
             return cookieValue;
         }
     </script>
+    <script>
+        $(document).on("change", "#evidence_name", function() {
+            if ($(this).val() === "") {
+                $("#examiner").empty();
+                return;
+            }
+            const evidenceId = $(this).val();
+            const url = "/evidence/get_case_members_by_evidence/" + evidenceId;
+
+            $.getJSON(url, function(members) {
+                let options = '';
+                if (members.length === 0) {
+                    options = '<option value="">No examiners available</option>';
+                } else {
+                    $.each(members, function(index, member) {
+                        options += '<option value="' + member.id + '">' + member.user_name + ' (' + member.user_roles + ')</option>';
+                    });
+                }
+                $("#examiner").html(options);
+            }).fail(function() {
+                $("#examiner").empty();
+                alert("Failed to load examiners. Please try again.");
+            });
+        });
+    </script>
 
 {% endblock javascripts %}
