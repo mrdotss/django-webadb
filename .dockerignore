@@ -1,0 +1,17 @@
+# -- ignore JS deps and stray via dirs
+apps/**/node_modules/
+apps/**/via/
+
+# -- editor/temp files
+**/#*
+
+# -- Python cache
+__pycache__/
+*.pyc
+
+# -- host‐mounted static folder
+static/
+
+# -- VCS & env
+.git/
+.env
