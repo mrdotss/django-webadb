@@ -37,6 +37,7 @@ packaging
 pillow
 prompt_toolkit
 psutil
+gunicorn
 psycopg2-binary
 pyasn1
 pyasn1_modules
